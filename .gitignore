@@ -1,7 +1,10 @@
-# Node.js dependencies
-node_modules/
-npm-debug.log
-yarn-error.log
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
 
 # Logs
 logs/

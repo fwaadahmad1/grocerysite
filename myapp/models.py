@@ -4,8 +4,15 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
-# Create your models here.
 class Type(models.Model):
+    """
+    Type model represents a category or type of items in the grocery site.
+    Attributes:
+        name (CharField): The name of the type, with a maximum length of 200 characters.
+    Methods:
+        __str__(): Returns a string representation of the Type instance.
+    """
+
     name = models.CharField(max_length=200)
 
     def __str__(self):
@@ -13,6 +20,19 @@ class Type(models.Model):
 
 
 class Item(models.Model):
+    """
+    Represents an item in the grocery store.
+    Attributes:
+        type (ForeignKey): A foreign key to the Type model, representing the category of the item.
+        name (CharField): The name of the item, with a maximum length of 200 characters.
+        price (DecimalField): The price of the item, with up to 10 digits and 2 decimal places.
+        stock (PositiveIntegerField): The number of items in stock, defaulting to 100.
+        available (BooleanField): A boolean indicating if the item is available, defaulting to True.
+        description (TextField): A text field for the item's description, which can be null or blank.
+    Methods:
+        __str__(): Returns a string representation of the item, including its name, type, price, stock, availability, and description.
+    """
+
     type = models.ForeignKey(Type, related_name="items", on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -25,6 +45,18 @@ class Item(models.Model):
 
 
 class Client(User):
+    """
+    Client model that extends the User model.
+    Attributes:
+        CITY_CHOICES (list of tuple): List of tuples containing city choices.
+        shipping_address (CharField): Shipping address of the client, can be null or blank.
+        city (CharField): City of the client, chosen from CITY_CHOICES, defaults to "CH".
+        interested_in (ManyToManyField): Types the client is interested in.
+        phone_number (CharField): Phone number of the client, can be null or blank.
+    Methods:
+        __str__(): Returns a string representation of the Client instance, including username, shipping address, city, and interested types.
+    """
+
     CITY_CHOICES = [
         ("WD", "Windsor"),
         ("TO", "Toronto"),
@@ -44,6 +76,20 @@ class Client(User):
 
 
 class OrderItem(models.Model):
+    """
+    OrderItem model represents an item in an order placed by a client.
+    Attributes:
+        ORDER_STATUS_CHOICES (list of tuple): Choices for the status of the order item.
+        item (ForeignKey): Reference to the Item model.
+        client (ForeignKey): Reference to the Client model.
+        quantity (PositiveIntegerField): Quantity of the item ordered.
+        status (IntegerField): Status of the order item, default is 1 (Placed).
+        last_updated (DateTimeField): Timestamp of the last update to the order item.
+    Methods:
+        total_price(): Calculates the total price of the order item based on the item price and quantity.
+        __str__(): Returns a string representation of the order item.
+    """
+
     ORDER_STATUS_CHOICES = [
         (0, "Cancelled"),
         (1, "Placed"),

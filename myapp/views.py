@@ -9,6 +9,18 @@ from django.shortcuts import render
 
 # Create your views here.
 def index(request):
+    """
+    View function for the index page of the grocery site.
+
+    This function retrieves all types and the top 10 most expensive items from the database,
+    orders them, and constructs an HTTP response with this information formatted as HTML.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: An HTTP response containing the HTML representation of types and items.
+    """
     type_list = Type.objects.all().order_by("id")
     item_list = Item.objects.all().order_by("-price")[:10]
     response = HttpResponse()
@@ -28,6 +40,26 @@ def index(request):
 
 
 def about(request, year=None, month=None):
+    """
+    View function to display information about the online grocery store.
+
+    This function constructs an HTTP response with information about the store and the formatted date,
+    if provided. The date can be specified by year, month, or both. If an invalid date format is provided,
+    a 400 Bad Request response is returned.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        year (int, optional): The year to be displayed. Defaults to None.
+        month (int, optional): The month to be displayed. Defaults to None.
+
+    Returns:
+        HttpResponse: A response containing information about the store and the formatted date, if provided.
+                      If both year and month are provided, the response includes the formatted month and year.
+                      If only the year is provided, the response includes the year.
+                      If only the month is provided, the response includes the month.
+                      If neither is provided, a generic message about the store is returned.
+                      If an invalid date format is provided, a 400 Bad Request response is returned.
+    """
     try:
         if year and month:
             date = datetime(year=int(year), month=int(month), day=1)
@@ -54,6 +86,20 @@ def about(request, year=None, month=None):
 
 
 def detail(request, type_no):
+    """
+    View function to display the details of items of a specific type.
+
+    This function retrieves the type object based on the provided type number,
+    filters the items by the type, and constructs an HTTP response with the list of items
+    formatted as HTML.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        type_no (int): The ID of the type to filter items by.
+    Returns:
+        HttpResponse: An HTTP response containing the list of items of the specified type.
+    """
+
     type_obj = get_object_or_404(Type, id=type_no)
     item_list = Item.objects.filter(type=type_obj).order_by("name")
     response = HttpResponse()
@@ -74,24 +120,43 @@ def detail(request, type_no):
 
 
 """
-The provided code shows the differences between FBV and CBV:
+differences between FBV and CBV:
 FBV:
 Constructs HTML manually and writes it to the response.
 Handles all logic within a single function.
 CBV:
 Uses a class with a get method to handle GET requests.
+Handles logic in separate methods within the class.
+HTML template file (items_list.html) is used to render the list of items in a structured format.
 Utilizes render() to return an HTML template with context data.
-This module contains views for a grocery site application.
-
-ItemView(View):
-    Handles GET requests to display a list of items using an HTML template.
 """
 
 
 class ItemView(View):
+    """
+    ItemView class handles the display of items in the grocery site.
+
+    Methods:
+        get(request):
+            Handles GET requests to retrieve and display a list of items.
+            Queries all items from the database, orders them by name, and renders the 'items_list.html' template with the items as context data.
+
+    Attributes:
+        None
+    """
+
     @staticmethod
     def get(request):
-        # In CBV, we use class methods like get() to handle GET requests.
-        # We use the render() function to return an HTML template with context data.
+        """
+        Handles GET requests to retrieve and display a list of items.
+
+        This method queries all items from the database, orders them by name, and renders the 'items_list.html' template with the items as context data.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+
+        Returns:
+            HttpResponse: An HTTP response object containing the rendered HTML template with the list of items.
+        """
         items = Item.objects.all().order_by("name")
         return render(request, "items_list.html", {"items": items})
