@@ -1,122 +1,49 @@
 # Import necessary classes
 from django.http import HttpResponse
-from .models import Type, Item
+from .models import LabMember, Type, Item
 from django.shortcuts import get_object_or_404
 from datetime import datetime
 from django.views import View
 from django.shortcuts import render
+from django.views.generic import ListView, DetailView
 
 
 # Create your views here.
 def index(request):
-    """
-    View function for the index page of the grocery site.
-
-    This function retrieves all types and the top 10 most expensive items from the database,
-    orders them, and constructs an HTTP response with this information formatted as HTML.
-
-    Args:
-        request (HttpRequest): The HTTP request object.
-
-    Returns:
-        HttpResponse: An HTTP response containing the HTML representation of types and items.
-    """
-    type_list = Type.objects.all().order_by("id")
-    item_list = Item.objects.all().order_by("-price")[:10]
-    response = HttpResponse()
-    heading1 = "<p>" + "Different Types: " + "</p>"
-    response.write(heading1)
-    for type in type_list:
-        para = "<p>" + str(type.id) + ": " + str(type) + "</p>"
-        response.write(para)
-    heading2 = "<p>" + "Top 10 Most Expensive Items: " + "</p>"
-    response.write(heading2)
-    for item in item_list:
-        para = (
-            "<p>" + str(item.id) + ": " + str(item) + " - $" + str(item.price) + "</p>"
-        )
-        response.write(para)
-    return response
+    type_list = Type.objects.all().order_by("id")[:10]
+    return render(request, "myapp/index.html", {"type_list": type_list})
 
 
-def about(request, year=None, month=None):
-    """
-    View function to display information about the online grocery store.
+class AboutView(View):
+    def get(self, request, year=None, month=None):
+        context = {}
+        try:
+            if year and month:
+                date = datetime(year=int(year), month=int(month), day=1)
+                context["formatted_date"] = date.strftime("%B, %Y")
+                context["message"] = "This is an Online Grocery Store."
+            elif year:
+                date = datetime(year=int(year), month=1, day=1)
+                context["formatted_date"] = date.strftime("%Y")
+                context["message"] = "This is an Online Grocery Store."
+            elif month:
+                date = datetime(year=1, month=int(month), day=1)
+                context["formatted_date"] = date.strftime("%B")
+                context["message"] = "This is an Online Grocery Store."
+            else:
+                context["message"] = "This is an Online Grocery Store."
+        except ValueError:
+            context["message"] = "Invalid date format"
+            return render(request, "myapp/about.html", context, status=400)
 
-    This function constructs an HTTP response with information about the store and the formatted date,
-    if provided. The date can be specified by year, month, or both. If an invalid date format is provided,
-    a 400 Bad Request response is returned.
-
-    Args:
-        request (HttpRequest): The HTTP request object.
-        year (int, optional): The year to be displayed. Defaults to None.
-        month (int, optional): The month to be displayed. Defaults to None.
-
-    Returns:
-        HttpResponse: A response containing information about the store and the formatted date, if provided.
-                      If both year and month are provided, the response includes the formatted month and year.
-                      If only the year is provided, the response includes the year.
-                      If only the month is provided, the response includes the month.
-                      If neither is provided, a generic message about the store is returned.
-                      If an invalid date format is provided, a 400 Bad Request response is returned.
-    """
-    try:
-        if year and month:
-            date = datetime(year=int(year), month=int(month), day=1)
-            formatted_date = date.strftime("%B, %Y")
-            return HttpResponse(
-                f"This is an Online Grocery Store. Date: {formatted_date}"
-            )
-        elif year:
-            date = datetime(year=int(year), month=1, day=1)
-            formatted_date = date.strftime("%Y")
-            return HttpResponse(
-                f"This is an Online Grocery Store. Year: {formatted_date}"
-            )
-        elif month:
-            date = datetime(year=1, month=int(month), day=1)
-            formatted_date = date.strftime("%B")
-            return HttpResponse(
-                f"This is an Online Grocery Store. Month: {formatted_date}"
-            )
-        else:
-            return HttpResponse("This is an Online Grocery Store.")
-    except ValueError:
-        return HttpResponse("Invalid date format", status=400)
+        return render(request, "myapp/about.html", context)
 
 
 def detail(request, type_no):
-    """
-    View function to display the details of items of a specific type.
-
-    This function retrieves the type object based on the provided type number,
-    filters the items by the type, and constructs an HTTP response with the list of items
-    formatted as HTML.
-
-    Args:
-        request (HttpRequest): The HTTP request object.
-        type_no (int): The ID of the type to filter items by.
-    Returns:
-        HttpResponse: An HTTP response containing the list of items of the specified type.
-    """
-
     type_obj = get_object_or_404(Type, id=type_no)
     item_list = Item.objects.filter(type=type_obj).order_by("name")
-    response = HttpResponse()
-    heading = "<p>Items of type: " + str(type_obj) + "</p>"
-    response.write(heading)
-    for item in item_list:
-        para = (
-            "<p>"
-            + str(item.id)
-            + ": "
-            + str(item.name)
-            + " - $"
-            + str(item.price)
-            + "</p>"
-        )
-        response.write(para)
-    return response
+    context = {"type": type_obj, "items": item_list}
+    return render(request, "myapp/detail.html", context)
 
 
 """
@@ -160,3 +87,16 @@ class ItemView(View):
         """
         items = Item.objects.all().order_by("name")
         return render(request, "items_list.html", {"items": items})
+
+
+class LabGroupView(ListView):
+    model = LabMember
+    template_name = "myapp/lab_group.html"
+    context_object_name = "lab_members"
+    ordering = ["-first_name"]
+
+
+class LabMemberDetailView(DetailView):
+    model = LabMember
+    template_name = "myapp/lab_member_detail.html"
+    context_object_name = "lab_member"

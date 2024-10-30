@@ -1,0 +1,28 @@
+<!-- FILE: templates/myapp/lab_group.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab Group Members</title>
+  </head>
+  <body>
+    <h1>Lab Group Members</h1>
+    <ul>
+      {% for member in lab_members %}
+      <li>
+        <strong
+          ><a href="{% url 'myapp:lab_member_detail' member.id %}"
+            >{{ member.first_name }} {{ member.last_name }}</a
+          ></strong
+        ><br />
+        <a href="{{ member.personal_page }}" target="_blank">Personal Page</a
+        ><br />
+        Email: <a href="mailto:{{ member.email }}">{{ member.email }}</a><br />
+        Date of Birth: {{ member.dob }}<br />
+        Gender: {{ member.gender }}
+      </li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

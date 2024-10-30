@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detail Page</title>
+  </head>
+  <body>
+    <h1>Items of type: {{ type.name }}</h1>
+    <ul>
+      {% for item in items %}
+      <li>{{ item.id }}: {{ item.name }} - ${{ item.price }}</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'myapp:index' %}">Back to Main Page</a>
+  </body>
+</html>

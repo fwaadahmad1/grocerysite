@@ -110,3 +110,24 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"OrderItem(name={self.item.name}, quantity={self.quantity}, status={self.status}, client={self.client.username})"
+
+
+class LabMember(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=254, null=True, blank=True)
+    dob = models.DateField(null=True, blank=True)
+    gender = models.CharField(
+        max_length=1,
+        choices=[
+            ("M", "Male"),
+            ("F", "Female"),
+            ("O", "Other"),
+        ],
+        null=True,
+        blank=True,
+    )
+    personal_page = models.URLField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
