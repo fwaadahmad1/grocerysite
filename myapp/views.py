@@ -8,12 +8,19 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
 
-# Create your views here.
+# Yes, extra context variables are being passed to the template
+# These extra variables are:
+# 1. type_list: The first 10 types ordered by id from the database (Type model) are passed to the template. This is used to display the types in the home page. The template iterates over the type_list to display the types.
 def index(request):
+    # Fetch the first 10 types ordered by id
     type_list = Type.objects.all().order_by("id")[:10]
     return render(request, "myapp/index.html", {"type_list": type_list})
 
 
+# Yes, extra context variables are being passed to the template
+# These extra variables are:
+# 1. message: A message is passed to the template. This is used to display a message in the about page.
+# 2. formatted_date: The formatted date is passed to the template. This is used to display the formatted date in the about page. The formatted date is based on the year and month provided in the URL. If no year or month is provided, the formatted date is not displayed.
 class AboutView(View):
     def get(self, request, year=None, month=None):
         context = {}
