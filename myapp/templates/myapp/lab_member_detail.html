@@ -1,20 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ lab_member.first_name }} {{ lab_member.last_name }}</title>
-  </head>
-  <body>
-    <h1>{{ lab_member.first_name }} {{ lab_member.last_name }}</h1>
-    <p>
-      Email: <a href="mailto:{{ lab_member.email }}">{{ lab_member.email }}</a>
-    </p>
-    <p>Date of Birth: {{ lab_member.dob }}</p>
-    <p>Gender: {{ lab_member.gender }}</p>
-    <p>
-      <a href="{{ lab_member.personal_page }}" target="_blank">Personal Page</a>
-    </p>
-    <p><a href="{% url 'myapp:lab_group' %}">Back to Lab Group</a></p>
-  </body>
-</html>
+{% extends 'myapp/base.html' %} {% block body_block %}
+<h1>{{ lab_member.first_name }} {{ lab_member.last_name }}</h1>
+<p>Email: <a href="mailto:{{ lab_member.email }}">{{ lab_member.email }}</a></p>
+<p>Date of Birth: {{ lab_member.dob }}</p>
+<p>Gender: {{ lab_member.gender }}</p>
+<p>
+  <a href="{{ lab_member.personal_page }}" target="_blank">Personal Page</a>
+</p>
+<p><a href="{% url 'myapp:lab_group' %}">Back to Lab Group</a></p>
+{% endblock %} >

@@ -1,27 +1,42 @@
 # Import necessary classes
-from django.http import HttpResponse
-from .models import LabMember, Type, Item
+from django.http import HttpResponse, HttpResponseRedirect
+from .models import LabMember, Type, Item, OrderItem, Client
+from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render
 from datetime import datetime
 from django.views import View
 from django.views.generic import ListView, DetailView
+from django.urls import reverse, reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-# Yes, extra context variables are being passed to the template
-# These extra variables are:
-# 1. type_list: The first 10 types ordered by id from the database (Type model) are passed to the template. This is used to display the types in the home page. The template iterates over the type_list to display the types.
 def index(request):
+    # Session counter
+    if "index_count" in request.session:
+        request.session["index_count"] += 1
+    else:
+        request.session["index_count"] = 1
+
     # Fetch the first 10 types ordered by id
     type_list = Type.objects.all().order_by("id")[:10]
-    return render(request, "myapp/index.html", {"type_list": type_list})
+
+    # Cookie setting
+    response = render(request, "myapp/index.html", {"type_list": type_list})
+    response.set_cookie("index_cookie", "index_value", max_age=10)
+    return response
 
 
-# Yes, extra context variables are being passed to the template
-# These extra variables are:
-# 1. message: A message is passed to the template. This is used to display a message in the about page.
-# 2. formatted_date: The formatted date is passed to the template. This is used to display the formatted date in the about page. The formatted date is based on the year and month provided in the URL. If no year or month is provided, the formatted date is not displayed.
 class AboutView(View):
     def get(self, request, year=None, month=None):
+        # Session counter
+        if "about_count" in request.session:
+            request.session["about_count"] += 1
+        else:
+            request.session["about_count"] = 1
+
         context = {}
         try:
             if year and month:
@@ -42,55 +57,32 @@ class AboutView(View):
             context["message"] = "Invalid date format"
             return render(request, "myapp/about.html", context, status=400)
 
-        return render(request, "myapp/about.html", context)
+        # Cookie setting
+        response = render(request, "myapp/about.html", context)
+        response.set_cookie("about_cookie", "about_value", max_age=10)
+        return response
 
 
 def detail(request, type_no):
+    # Session counter
+    if "detail_count" in request.session:
+        request.session["detail_count"] += 1
+    else:
+        request.session["detail_count"] = 1
+
     type_obj = get_object_or_404(Type, id=type_no)
     item_list = Item.objects.filter(type=type_obj).order_by("name")
     context = {"type": type_obj, "items": item_list}
-    return render(request, "myapp/detail.html", context)
 
-
-"""
-differences between FBV and CBV:
-FBV:
-Constructs HTML manually and writes it to the response.
-Handles all logic within a single function.
-CBV:
-Uses a class with a get method to handle GET requests.
-Handles logic in separate methods within the class.
-HTML template file (items_list.html) is used to render the list of items in a structured format.
-Utilizes render() to return an HTML template with context data.
-"""
+    # Cookie setting
+    response = render(request, "myapp/detail.html", context)
+    response.set_cookie("detail_cookie", "detail_value", max_age=10)
+    return response
 
 
 class ItemView(View):
-    """
-    ItemView class handles the display of items in the grocery site.
-
-    Methods:
-        get(request):
-            Handles GET requests to retrieve and display a list of items.
-            Queries all items from the database, orders them by name, and renders the 'items_list.html' template with the items as context data.
-
-    Attributes:
-        None
-    """
-
     @staticmethod
     def get(request):
-        """
-        Handles GET requests to retrieve and display a list of items.
-
-        This method queries all items from the database, orders them by name, and renders the 'items_list.html' template with the items as context data.
-
-        Args:
-            request (HttpRequest): The HTTP request object.
-
-        Returns:
-            HttpResponse: An HTTP response object containing the rendered HTML template with the list of items.
-        """
         items = Item.objects.all().order_by("name")
         return render(request, "items_list.html", {"items": items})
 
@@ -109,9 +101,54 @@ class LabMemberDetailView(DetailView):
 
 
 def items(request):
-    itemlist = Item.objects.all().order_by('id')[:20]
-    return render(request, 'myapp/items.html', {'itemlist': itemlist})
+    itemlist = Item.objects.all().order_by("id")[:20]
+    return render(request, "myapp/items.html", {"itemlist": itemlist})
 
 
 def placeorder(request):
     return render(request, "myapp/placeorder.html")
+
+
+class SignUpView(CreateView):
+    form_class = UserCreationForm
+    template_name = "myapp/signup.html"
+    success_url = reverse_lazy("myapp:login")
+
+
+def user_login(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(username=username, password=password)
+        if user:
+            if user.is_active:
+                login(request, user)
+                return HttpResponseRedirect(reverse("myapp:index"))
+            else:
+                return HttpResponse("Your account is disabled.")
+        else:
+            return HttpResponse("Invalid login details.")
+    else:
+        return render(request, "myapp/login.html")
+
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse(("myapp:index")))
+
+
+@login_required(login_url="/login/")
+def myorders(request):
+    user = request.user
+    if user.is_authenticated:
+        if hasattr(user, "client"):
+            client = user.client
+            orders = OrderItem.objects.filter(client=client)
+            return render(
+                request, "myapp/myorders.html", {"orders": orders, "user": user}
+            )
+        else:
+            return HttpResponse("You are not a registered client!")
+    else:
+        return HttpResponse("You are not authenticated!")

@@ -12,6 +12,7 @@
     {% if formatted_date %}
     <p>Date: {{ formatted_date }}</p>
     {% endif %}
+    <p><a href="{% url 'myapp:lab_group' %}">View Lab Group</a></p>
     {% endblock %}
   </body>
 </html>

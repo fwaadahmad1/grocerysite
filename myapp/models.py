@@ -51,18 +51,6 @@ class Item(models.Model):
 
 
 class Client(User):
-    """
-    Client model that extends the User model.
-    Attributes:
-        CITY_CHOICES (list of tuple): List of tuples containing city choices.
-        shipping_address (CharField): Shipping address of the client, can be null or blank.
-        city (CharField): City of the client, chosen from CITY_CHOICES, defaults to "CH".
-        interested_in (ManyToManyField): Types the client is interested in.
-        phone_number (CharField): Phone number of the client, can be null or blank.
-    Methods:
-        __str__(): Returns a string representation of the Client instance, including username, shipping address, city, and interested types.
-    """
-
     CITY_CHOICES = [
         ("WD", "Windsor"),
         ("TO", "Toronto"),

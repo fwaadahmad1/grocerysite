@@ -13,12 +13,23 @@
   </head>
   <body>
     <nav>
-      <ul>
+      <ul class="nav-links">
         <li><a href="{% url 'myapp:index' %}">Home</a></li>
         <li><a href="{% url 'myapp:about' %}">About</a></li>
         <li><a href="{% url 'myapp:items' %}">Items</a></li>
+        <li><a href="{% url 'myapp:myorders' %}">My Orders</a></li>
+      </ul>
+      <ul class="auth-links">
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'myapp:logout' %}">Logout</a></li>
+        <li>Welcome, {{ user.username }}!</li>
+        {% else %}
+        <li><a href="{% url 'myapp:login' %}">Login</a></li>
+        <li><a href="{% url 'myapp:signup' %}">Signup</a></li>
+        {% endif %}
       </ul>
     </nav>
+    <div></div>
     <div>
       <h1>
         {% block myhdg %} Welcome to our online grocery store {% endblock %}

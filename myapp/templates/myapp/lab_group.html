@@ -7,6 +7,8 @@
     <title>Lab Group Members</title>
   </head>
   <body>
+    {% extends 'myapp/base.html' %}
+    {% block body_block %}
     <h1>Lab Group Members</h1>
     <ul>
       {% for member in lab_members %}
@@ -24,5 +26,6 @@
       </li>
       {% endfor %}
     </ul>
+    {% endblock %}
   </body>
 </html>

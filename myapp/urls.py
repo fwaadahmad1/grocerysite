@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 
 """
 URL configuration for the 'myapp' Django application.
@@ -40,4 +41,12 @@ urlpatterns = [
     ),
     # Place order view
     path("placeorder/", views.placeorder, name="placeorder"),
+    # My Orders view
+    path("myorders/", views.myorders, name="myorders"),
+    # Signup view
+    path("signup/", views.SignUpView.as_view(), name="signup"),
+    # Login view
+    path("login/", views.user_login, name="login"),
+    # Logout view
+    path("logout/", views.user_logout, name="logout"),
 ]
