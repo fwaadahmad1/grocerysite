@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'myapp/style.css'%}"
+    />
+    <title>
+      Online Grocery Store - {% block title %} Welcome! {% endblock %}
+    </title>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li><a href="{% url 'myapp:index' %}">Home</a></li>
+        <li><a href="{% url 'myapp:about' %}">About</a></li>
+        <li><a href="{% url 'myapp:items' %}">Items</a></li>
+      </ul>
+    </nav>
+    <div>
+      <h1>
+        {% block myhdg %} Welcome to our online grocery store {% endblock %}
+      </h1>
+      {% block body_block %}*** {% endblock %}
+    </div>
+    <div>
+      <ul>
+        <li class="hbar1">
+          <a href="http://127.0.0.1:8000/about/"> Find out about this site </a>
+        </li>
+        <li class="hbar1">
+          <a href="{% url 'myapp:index'%}">
+            Click here to return to main page </a
+          ><br />
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>

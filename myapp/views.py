@@ -1,10 +1,9 @@
 # Import necessary classes
 from django.http import HttpResponse
 from .models import LabMember, Type, Item
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from datetime import datetime
 from django.views import View
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
 
@@ -107,3 +106,12 @@ class LabMemberDetailView(DetailView):
     model = LabMember
     template_name = "myapp/lab_member_detail.html"
     context_object_name = "lab_member"
+
+
+def items(request):
+    itemlist = Item.objects.all().order_by('id')[:20]
+    return render(request, 'myapp/items.html', {'itemlist': itemlist})
+
+
+def placeorder(request):
+    return render(request, "myapp/placeorder.html")

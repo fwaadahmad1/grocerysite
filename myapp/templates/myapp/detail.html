@@ -6,6 +6,8 @@
     <title>Detail Page</title>
   </head>
   <body>
+    {% extends 'myapp/base.html' %}
+    {% block body_block %}
     <h1>Items of type: {{ type.name }}</h1>
     <ul>
       {% for item in items %}
@@ -13,5 +15,6 @@
       {% endfor %}
     </ul>
     <a href="{% url 'myapp:index' %}">Back to Main Page</a>
+    {% endblock %}
   </body>
 </html>

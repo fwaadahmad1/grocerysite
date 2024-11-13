@@ -29,6 +29,7 @@ class Item(models.Model):
         stock (PositiveIntegerField): The number of items in stock, defaulting to 100.
         available (BooleanField): A boolean indicating if the item is available, defaulting to True.
         description (TextField): A text field for the item's description, which can be null or blank.
+        interested (PositiveIntegerField): The number of people interested in the item, defaulting to 0.
     Methods:
         __str__(): Returns a string representation of the item, including its name, type, price, stock, availability, and description.
     """
@@ -39,9 +40,14 @@ class Item(models.Model):
     stock = models.PositiveIntegerField(default=100)
     available = models.BooleanField(default=True)
     description = models.TextField(null=True, blank=True)
+    interested = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f"Item(name={self.name}, type={self.type.name}, price={self.price}, stock={self.stock}, available={self.available}, description={self.description})"
+
+    def topup(self):
+        self.stock += 50
+        self.save()
 
 
 class Client(User):

@@ -17,7 +17,9 @@ from . import views
 
 app_name = "myapp"
 urlpatterns = [
+    # Index view
     path("", views.index, name="index"),
+    # About view
     path("about/", views.AboutView.as_view(), name="about"),
     path("about/<int:year>/", views.AboutView.as_view(), name="about_year"),
     path(
@@ -25,12 +27,17 @@ urlpatterns = [
         views.AboutView.as_view(),
         name="about_year_month",
     ),
+    # Detail view
     path("<int:type_no>/", views.detail, name="detail"),
-    path("items/", views.ItemView.as_view(), name="items"),
+    # Items view
+    path("items/", views.items, name="items"),
+    # Lab group and member views
     path("lab-group/", views.LabGroupView.as_view(), name="lab_group"),
     path(
         "lab-member/<int:pk>/",
         views.LabMemberDetailView.as_view(),
         name="lab_member_detail",
     ),
+    # Place order view
+    path("placeorder/", views.placeorder, name="placeorder"),
 ]
